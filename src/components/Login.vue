@@ -74,7 +74,7 @@
 	}
 </script>
 
-<style>
+<style scoped>
 	.login-box {
 		width: 400px;
 		height: 320px;

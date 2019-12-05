@@ -16,7 +16,8 @@
 			
 				<el-aside :width="flag?'64px':'200px'">
 				  
-				<el-menu :unique-opened="true" unique-opened :collapse="flag" :collapse-transition="false" router>
+				<el-menu :unique-opened="true" unique-opened :collapse="flag" :collapse-transition="false" router  :default-active="path">
+									<!--//-->
 					<div class="homgtogger">
 						<i class="el-icon-remove-outline i-togger" @click="togger"></i>
 					</div>
@@ -32,7 +33,7 @@
 						<span>{{item.authName}}</span> 
 					</template>
 						<!--二级菜单-->
-					<el-menu-item :index="childrenItem.path" v-for='childrenItem in item.children'>
+					<el-menu-item :index="childrenItem.path" v-for='childrenItem in item.children' @click='setPath(childrenItem.path)'>
 						<template slot="title">
 							
 							<span>{{childrenItem.authName}}</span>
@@ -64,6 +65,7 @@
 			return {
 				flag: false,
 				menusArr:[],
+				path:'',
 				icons:{
 					125:'iconfont icon-guanlingyonghuguanli',
 					103:'iconfont icon-jueseguanli',
@@ -89,13 +91,35 @@
 			//获取左边权限的数据方法
 			async getmenus(){
 				const {data:ret} = await this.$http.get('menus')
-				console.log( ret.data ) //拿到的是一个数组
+				//console.log( ret.data ) //拿到的是一个数组
 				this.menusArr =  ret.data 
+			},
+			//点击当前的二级菜单高亮显示
+			//保存链接的激活状态
+			setPath(path){ 
+				console.log(path) //拿到二级菜单的path
+				window .sessionStorage.setItem('path',path)//拿到的path进行本地存储
+				//再赋值给this.path
+				this.path = path
 			}
 		},
 		created(){
-			this.getmenus()
+			this.getmenus() //当页面一加载时左边的列表直接渲染出来
+			this.path = window .sessionStorage.getItem('path')
 		}
+		
+		
+		/*1. 动态渲染左边的菜单栏
+		2.退出按钮事件
+			先清除本地存储的token 
+			window.sessionStorage.removeItem('token')
+			让页面回到login登录页面 
+			this.$router.push('/logon')
+			
+		3.解决二级菜单的当前高亮显示
+			触发二级菜单的点击事件
+		原理:每次点击的二级菜单的地址存储在本地中,当页面一加载时将存储的地址赋值给this.path*/
+		
 	}
 </script>
 

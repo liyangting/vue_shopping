@@ -18,7 +18,7 @@
 			  
 			  <el-row class="login-elrow">
 				  
-				  <el-button type="primary" plain  @click="denglu">提交</el-button>
+				  <el-button type="primary" plain  @click="denglu">登录</el-button>
 				
 				  <el-button type="danger"  plain @click="chongzhi">重置</el-button>
 				</el-row>

@@ -6,6 +6,14 @@ import login from '../components/Login.vue'
 import Home from '../components/Home.vue'
 import Welcome from '../components/Welcome.vue'
 import Users from '../components/User/Users.vue'
+import Reports from '../components/Reports/Reports.vue'
+import Roles from '../components/Menus/Roles.vue'
+import Rights from '../components/Menus/Rights.vue'
+import Goods from '../components/Shopping/Goods.vue'
+import goods from '../components/Shopping/Goods.vue'
+import Params from '../components/Shopping/Params.vue'
+import Categories from '../components/Shopping/Categories.vue'
+import Orders from '../components/Orders/Orders.vue'
 
 const routes = [
 	{path:'/',redirect:'/login'},
@@ -16,7 +24,14 @@ const routes = [
 		redirect:'/welcome',
 		children:[
 			{path:'/welcome',component:Welcome},
-			{path:'/users',component:Users},
+			{path:'/users',component:Users},//用户列表页面		
+			{path:'/roles',component:Roles},//  角色列表页面
+			{path:'/rights',component:Rights},//  权限列表页面
+			{path:'/goods',component:Goods},//  权限列表页面
+			{path:'/params',component:Params},//  分类参数页面
+			{path:'/categories',component:Categories},//  商品分类页面
+			{path:'/orders',component:Orders},//  订单列表页面
+			{path:'/reports',component:Reports},// 数据报表页面
 				
 		]
 	}

@@ -1,5 +1,20 @@
 <template>
-	<div id="User">		
+	<div id="User">	
+		<!--1.用户列表的渲染
+		2.通过ID搜索用户
+		3.添加用户
+		4.用户状态的修改
+		5.通过ID修改和删除用户
+		6.分页展示功能
+		
+		技术点：
+		2.作用域插槽
+		-->
+		
+		
+		
+		
+		
 		<!--卡片-->	
 		<el-card>			
 		<!--面包屑导航-->	
@@ -44,11 +59,17 @@
 			<el-table-column fixed="right" label="操作" >
 				<template slot-scope="scope">
 					<!--修改按钮-->
-					  <el-button type="primary" icon="el-icon-edit" circle size="mini"></el-button>
+					
+					  <el-button type="primary" icon="el-icon-edit" circle size="mini" @click='xiugaiUers(scope.row.id)'></el-button>
+				
 					<!--删除按钮-->
-					  <el-button type="danger" icon="el-icon-delete" circle size="mini"></el-button>
+						
+						<el-button type="danger" icon="el-icon-delete" circle size="mini" @click='deletes(scope.row.id)'></el-button>
 					<!--设置按钮-->
-					  <el-button type="warning" icon="el-icon-setting" circle size="mini"></el-button>
+					 <el-tooltip content="设置角色" placement="top" >
+					      
+					 	<el-button type="warning" icon="el-icon-setting" circle size="mini"></el-button>
+					 </el-tooltip>
 				</template>
 			</el-table-column>			
 		</el-table>
@@ -67,7 +88,7 @@
 		 </el-pagination>
 		 
 		<!--添加用户对话框-->
-		<el-dialog title="添加用户" :visible.sync="dialogVisible" width="30%">
+		<el-dialog title="添加用户" :visible.sync="dialogVisible" width="30%" @close='addClose'>
 		  <!--添加用户的表单区域-->
 		  <!--:model="addForm" 数据的双向绑定-->
 		  <!--:rules="addFormUrl"  验证规则-->
@@ -94,10 +115,38 @@
 			</el-form>
 			
 			
-		  	<span slot="footer" class="dialog-footer">
-		    <el-button @click="dialogVisible = false">取 消</el-button>
-		    <el-button type="primary" @click="addUsers">确 定</el-button>
-		  </span>
+		  	<span slot="footer">
+			    <el-button @click="dialogVisible = false">取 消</el-button>
+			    <el-button type="primary" @click="addUsers">确 定</el-button>
+			</span>
+		</el-dialog>
+		
+		<!--编辑用户的对话框-->
+		<el-dialog title="编辑用户" :visible.sync="xiugaidialogVisible" width="30%" @close='xiugaiClose'>
+		  <!--添加用户的表单区域-->
+		  <!--:model="xiugaiUersForm" 数据的双向绑定-->
+		  <!--:rules="xiugaiFormUrl"  验证规则-->
+			<el-form :model="xiugaiUersForm" :rules="xiugaiFormUrl" ref="xiugaiFormRef" label-width="100px">
+				<!--、用户名-->
+			  <el-form-item label="用户名" prop="username" >
+			    <el-input v-model="xiugaiUersForm.username" disabled></el-input>
+			  </el-form-item>
+			  
+			   <!--邮箱-->
+			  <el-form-item label="邮箱" prop="email">
+			    <el-input v-model="xiugaiUersForm.email"></el-input>
+			  </el-form-item>
+			  
+			  <!--电话-->
+			 <el-form-item label="电话" prop="mobile">
+			    <el-input v-model="xiugaiUersForm.mobile"></el-input>
+			  </el-form-item>
+			</el-form>
+			</el-form>
+		  	<span slot="footer">
+			    <el-button @click="xiugaidialogVisible = false">取 消</el-button>
+			    <el-button type="primary" @click="xiugaidialogSubmit">确 定</el-button>
+			</span>
 		</el-dialog>
 		
 	</div>
@@ -164,7 +213,19 @@
 			        mobile: [
 			            { validator: checkMobil, trigger: 'blur' }
 					]		
-				}
+				},
+//				点击修改 弹框的显示和隐藏
+				xiugaidialogVisible:false,
+				//根据用户查询到的用户信息
+				 xiugaiUersForm:{},
+				 xiugaiFormUrl:{
+				 	 email: [
+			            { validator: checkEmail, trigger: 'blur' }
+			        ],
+			        mobile: [
+			            { validator: checkMobil, trigger: 'blur' }
+					]		
+				 }
 				
 			}
 		},
@@ -172,7 +233,7 @@
 		//获取数据库中的用户列表
 			async getuserList(){
 				const {data:ret} = await this.$http.get('users',{params:this.tableData})
-				console.log(ret)
+				//console.log(ret)
 		//判断当前状态，当状态不是200时，提示用户有异常
 				if(ret.meta.status !== 200 ){
 					return this.$message.error(ret.meta.msg)
@@ -209,7 +270,7 @@
 		    },
 		    handleCurrentChange(val) {
 		    	//当前页的改变
-//		       	console.log(`当前页: ${val}`);
+		       	console.log(`当前页: ${val}`);
 				this.tableData.pagenum = val 
 				this.getuserList()
 		    },
@@ -232,6 +293,59 @@
 					this.getuserList()
 					
 			     });
+			},
+		//删除单个用户
+			async deletes(id){
+				
+
+				const {data:ret} = await this.$http.delete('users/' + id)
+				console.log(ret)
+				if(ret.meta.status !== 200 ){
+					return this.$message.error(ret.meta.mag)
+				}
+				this.getuserList()
+			},
+			//关闭添加框清除表单内容的方法
+			addClose(){
+				this.$refs.addFormRef.resetFields();
+			},
+			//根据ID查询到要修改的用户的操作
+			async xiugaiUers(id){
+				const {data:ret} = await this.$http.get('users/' + id)
+//				console.log(ret)
+				if(ret.meta.status !== 200 ) return this.message.error(ret.meta.mag)
+				this.xiugaiUersForm = ret.data
+				console.log(this.xiugaiUersForm)
+				this.xiugaidialogVisible = true
+				
+				
+			},
+			xiugaidialogSubmit(){
+				//预校验
+				this.$refs.xiugaiFormRef.validate(async vali => {
+//					console.log(vali)
+					//预校验失败
+					if(!vali) return this.$message.error('编辑失败')
+					//预校验成功 发送ajax
+					const {data:ret} = await this.$http.put('users/'+this.xiugaiUersForm.id,{
+						id:this.xiugaiUersForm.id,
+						email:this.xiugaiUersForm.email,
+						mobile:this.xiugaiUersForm.mobile
+					})
+					console.log(ret)
+					//更新失败提示用户
+					if(ret.meta.status !== 200) return this.$message.error(ret.meta.msg);
+					//更新提示用户更新成功
+					this.$message.success('更新成功');
+					//关闭修改信息创建窗口
+					this.xiugaidialogVisible = false
+					//重新渲染页面
+					this.getuserList()
+					
+				})
+			},
+			xiugaiClose(){
+				this.$refs.xiugaiFormRef.resetFields();
 			}
 		    
 		},
@@ -246,18 +360,13 @@
 	#User {
 		height: 100%;
 	}
-	.el-card{
-		margin: 0px 0;
-	}
+	
 	.el-pagination {
 		margin: 30px 0;
 		position: absolute;
 		/*right: 80px;*/
 		left: 50%;
 		transform: translate(-50%);
-	}
-	.el-breadcrumb {
-		margin-bottom: 15px;
 	}
 	.el-row {
 		margin: 10px 0;

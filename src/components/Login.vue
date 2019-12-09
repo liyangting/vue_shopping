@@ -1,5 +1,21 @@
 <template>
 	<div class="login">
+		<!--登录页面
+		1.验证用户的登录信息是否匹配（匹配规则/预验证）
+		2.验证用户输入的用户名和密码是否已经注册过
+		
+		技术点：
+		1.ES6的新特性async await进行异步处理   
+		2.ES6中的对象解构赋值
+		3.token进行临时存储(本地存储 sessionStorage)
+		4.路由导航守卫
+		router.beforeEach((to,from,next)=>{
+			参数一:to 将要访问的路径
+			参数二:from 从哪里跳转的
+			参数三:next 放行(直接跳转)
+		}-->
+		
+		
 		<div class="login-box">
 			<div class="login-img"><img src="../assets/f6ee658.jpg"/></div>
 			

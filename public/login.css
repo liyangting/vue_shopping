@@ -10,3 +10,6 @@ body,
 .el-breadcrumb {
 		margin-bottom: 20px;
 }
+.el-row {
+		margin: 10px 0;
+	}

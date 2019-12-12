@@ -1,8 +1,6 @@
 <template>
 	<div id="Roles">
-		
-		
-		
+
 		<!--<h1>角色列表页面</h1>-->
 		<el-card>		
 			<!--面包屑导航-->
@@ -12,7 +10,7 @@
 				  <el-breadcrumb-item>角色列表</el-breadcrumb-item>
 			</el-breadcrumb>
 			<!--点击添加角色弹出对话框-->
-			<el-button type="primary" plain @click="dialogVisible = true">添加角色</el-button>
+			<el-button  type="primary" plain @click="dialogVisible = true">添加角色</el-button>
 			
 			<el-table  :data="rolesList" style="width: 100%" border>
 			<!--表头-->
@@ -32,14 +30,14 @@
 								<el-row :class="[i2===0?'':'topBorder']" v-for='(item2,i2) in item1.children' :key="item2.id">
 									<!--二级-->
 									<el-col :span='6'>
-										<el-tag closable @close='removeTag(scope.row,item2.id)'>{{item2.authName}}</el-tag>
+										<el-tag type="success" closable @close='removeTag(scope.row,item2.id)'>{{item2.authName}}</el-tag>
 										<i class="el-icon-caret-right"></i>
 									</el-col>
 										
 										
 									<!--三级-->
 									<el-col :span='18' >
-										<el-tag closable @close='removeTag(scope.row,item3.id)' v-for='(item3,i3) in item2.children' :key="item3.id">{{item3.authName}}</el-tag>
+										<el-tag type="warning" closable @close='removeTag(scope.row,item3.id)' v-for='(item3,i3) in item2.children' :key="item3.id">{{item3.authName}}</el-tag>
 										
 									</el-col>
 								</el-row>
@@ -154,23 +152,25 @@
 				
 				this.dialogVisible = false 
 			},
+			//监听的对话框的关闭
 			addClose(){
-//				this.$refs.rolesRef.resetFields();
+				this.rolesData = {}
+
 			},
 			//点击删除角色的方法
 			async removeRoles(id){
 				
 				
-				const red =  await this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+				const red =  await this.$confirm('此操作将永久删除该角色, 是否继续?', '提示', {
 		          confirmButtonText: '确定',
 		          cancelButtonText: '取消',
 		          type: 'warning'
 		        }).catch( err => err) 
-		          console.log(red) //点击确定取消是confirm
+		          console.log(red) //点击确定是confirm
 		          					//点击取消时是cancel
-		        if(red != confirm) this.$message.error('取消成功')
+		        if(red != confirm) return this.$message.error('取消成功')
 		       	const {data:ret} = await this.$http.delete('roles/' + id)
-		        console.log(ret)					
+//		        console.log(ret)					
 				if(ret.meta.status !== 200) return this.$message.error(ret.meta.msg)		
 				this.$message.success(ret.meta.msg)
 				this.getRolesList()
@@ -187,8 +187,7 @@
 				console.log(this.treeArrKey)
 				this.treedialogVisible = true
 			},
-			treehandleNodeClick(){
-			},
+
 			getRightdId(node,arr){
 				//node 是节点
 				if(!node.children){//只有第三层没有children
@@ -223,7 +222,10 @@
 			//监听权限分配的对话框的关闭
 			treeClose(){
 				this.treeArrKey = []
-			}
+			},
+			
+				
+			
 		},
 		created(){
 			this.getRolesList()

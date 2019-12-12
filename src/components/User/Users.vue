@@ -66,9 +66,9 @@
 						
 						<el-button type="danger" icon="el-icon-delete" circle size="mini" @click='deletes(scope.row.id)'></el-button>
 					<!--设置按钮-->
-					 <el-tooltip content="设置角色" placement="top" >
+					 <el-tooltip content="分配角色" placement="top" >
 					      
-					 	<el-button type="warning" icon="el-icon-setting" circle size="mini"></el-button>
+					 	<el-button type="warning" icon="el-icon-setting" circle size="mini" @click='setRoles(scope.row)'></el-button>
 					 </el-tooltip>
 				</template>
 			</el-table-column>			
@@ -149,6 +149,27 @@
 			</span>
 		</el-dialog>
 		
+		<!--分配角色的弹框-->
+		<el-dialog @close='setRolesClose' title="分配角色" :visible.sync="setUserdialogVisible" width="30%">
+		 
+		 <h3>当前用户名：{{usersData.username}}</h3>
+		 <h3>当前角色名称：{{usersData.role_name}}</h3>
+		 <h3>修改角色为：
+		 <el-select v-model="roleId" placeholder="请选择">
+		    <el-option v-for="item in roleList" 
+		    	:key="item.id" 
+		    	:label="item.roleName" 
+		    	:value="item.id">
+		    </el-option>
+		  </el-select>
+		  </h3>
+		  <span slot="footer">
+		    <el-button @click="setUserdialogVisible = false">取 消</el-button>
+		    <el-button type="primary" @click="setRolesList">确 定</el-button>
+		  </span>
+		</el-dialog>
+
+		
 	</div>
 </template>
 
@@ -225,7 +246,14 @@
 			        mobile: [
 			            { validator: checkMobil, trigger: 'blur' }
 					]		
-				 }
+				 },
+//				 分配角色框的显示和隐藏
+				 setUserdialogVisible:false,
+//				 用户数据
+				usersData:[],
+				//角色列表
+				roleList:[],
+				roleId:''
 				
 			}
 		},
@@ -346,6 +374,41 @@
 			},
 			xiugaiClose(){
 				this.$refs.xiugaiFormRef.resetFields();
+			},
+//			分配角色的方法
+			async setRoles(role){
+				this.usersData = role
+				console.log(this.usersData)
+//				获取角色列表的数据
+//				
+				const {data:ret} = await this.$http.get('roles')
+				if(ret.meta.status !== 200 ) return this.$message.error(ret.meta.msg)
+				console.log(ret)
+				this.roleList = ret.data
+//				console.log(this.roleList)
+				this.setUserdialogVisible = true
+			},
+			//点击确定后分配角色的方法
+			async setRolesList(){
+				
+				console.log(this.roleId)
+				//判断用户是否有新的角色
+				if(!this.roleId){
+					return this.$message.info('请选择新的角色')
+				}
+//				有新角色后发送ajax
+				const {data:ret} = await this.$http.put(`users/${this.usersData.id}/role`,{
+					rid:this.roleId
+				})
+				if(ret.meta.status !== 200 ) return this.$message.error(ret.meta.msg)
+				this.$message.success(ret.meta.msg)
+				//重新渲染数据
+//				this.getuserList()
+				this.setUserdialogVisible = false
+			},
+			//监听分配角色当前的状态
+			setRolesClose(){
+				this.roleId = ''
 			}
 		    
 		},

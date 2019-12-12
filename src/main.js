@@ -11,6 +11,10 @@ Vue.use(ElementUI);
 import '../public/font/iconfont.css'
 import '../public/font/iconfont.js'
 
+//vue-table-with-tree-grid 插件
+import ZkTable from 'vue-table-with-tree-grid'
+Vue.component('tree', ZkTable)
+//Vue.use(ZkTable)
 //引用axios,发送ajax
 import axios from 'axios'
 //路径配置 固定写法

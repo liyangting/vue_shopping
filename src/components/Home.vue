@@ -33,7 +33,10 @@
 						<span>{{item.authName}}</span> 
 					</template>
 						<!--二级菜单-->
-					<el-menu-item :index="childrenItem.path" v-for='childrenItem in item.children' @click='setPath(childrenItem.path)'>
+						 
+						
+						
+					<el-menu-item :index=" '/' + childrenItem.path" v-for='childrenItem in item.children' @click="setPath( '/'+childrenItem.path)">
 						<template slot="title">
 							
 							<span>{{childrenItem.authName}}</span>
@@ -136,9 +139,9 @@
 		/*background-color: #0e2021c7;*/
 		
 	}
-	.el-menu-item {
+	/*.el-menu-item {
 		margin-left: 20px;
-	}
+	}*/
 	.el-container {
 		height: 100%;
 	}

@@ -13,6 +13,7 @@ import Goods from '../components/Shopping/Goods.vue'
 import goods from '../components/Shopping/Goods.vue'
 import Params from '../components/Shopping/Params.vue'
 import Categories from '../components/Shopping/Categories.vue'
+import Add from '../components/Shopping/Add.vue'
 import Orders from '../components/Orders/Orders.vue'
 
 const routes = [
@@ -27,11 +28,12 @@ const routes = [
 			{path:'/users',component:Users},//用户列表页面		
 			{path:'/roles',component:Roles},//  角色列表页面
 			{path:'/rights',component:Rights},//  权限列表页面
-			{path:'/goods',component:Goods},//  权限列表页面
+			{path:'/goods',component:Goods},//  商品列表页面
 			{path:'/params',component:Params},//  分类参数页面
 			{path:'/categories',component:Categories},//  商品分类页面
 			{path:'/orders',component:Orders},//  订单列表页面
 			{path:'/reports',component:Reports},// 数据报表页面
+			{path:'/goods/add',component:Add},// 添加商品页面
 				
 		]
 	}

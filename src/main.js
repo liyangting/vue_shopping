@@ -20,6 +20,18 @@ import axios from 'axios'
 //路径配置 固定写法
 axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
 
+
+
+//添加商品中商品内容的副文本框配置
+import VueQuillEditor from 'vue-quill-editor'
+
+// require styles
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+
+Vue.use(VueQuillEditor, /* { default global options } */)
+
 //将axios挂载在原型对象上，之后就可以直接使用this.$http
 Vue.prototype.$http = axios
 //有权限的api添加token

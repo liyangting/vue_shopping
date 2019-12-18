@@ -70,19 +70,47 @@
 				    <el-tab-pane label="商品属性" name='2'>
 				    	<el-form-item :label="item.attr_name" v-for="item in onlyCateList" :key="item.attr_id">
 				    		<el-input v-model='item.attr_vals'></el-input>
-						</el-form-item>
+						</el-form-item>				    	
+				    </el-tab-pane>
+				    
+				    <el-tab-pane label="商品图片" name='3'>
+				    	<el-upload	
+				    		:on-success='successFile'			    		
+				    		:headers='headerObj'
+							:action="actionPath"
+							:on-preview="handlePreview"
+							:on-remove="handleRemove"
+							list-type="picture">
+						  <el-button size="small" type="primary">点击上传</el-button>
+						 
+						</el-upload>
+				    	
 				    	
 				    </el-tab-pane>
-				    <el-tab-pane label="商品图片">商品图片</el-tab-pane>
-				    <el-tab-pane label="商品内容">商品内容</el-tab-pane>
+				    <el-tab-pane label="商品内容" name='4'>
+				    	<quill-editor v-model="addForm.content" class="contentSS"> </quill-editor>
+ 						<el-button type='primary' @click='addShopping'>添加商品</el-button>
+				    </el-tab-pane>
 				  
 				</el-tabs>
 			</el-form>
+			
+			
+			<!--图片放大的对话框-->
+			<el-dialog
+			  title="预览图片"
+			  :visible.sync="dialogVisibleImg"
+			  width="50%">
+			  <img :src="imgUrl" class="imgs"/>
+			
+			</el-dialog>
 		</el-card>		
 	</div>
 </template>
 
 <script>
+	//引入lodash
+	import _ from 'lodash'
 	export default {
 		data(){
 			return {
@@ -95,7 +123,11 @@
 					goods_number:'',//商品数量
 					goods_weight:'',//商品重量
 //					分类列表
-					goods_cat:[]
+					goods_cat:[],
+					pics:[],
+					//商品内容
+					content:'',
+					attrs:[]
 					
 				},
 				//验证规则
@@ -130,7 +162,19 @@
 				//参数的数据
 				manyCateList:[],
 //				属性数据
-				onlyCateList:[]
+				onlyCateList:[],
+//				图片配置
+				fileList:[],
+//				预览图片框的显示隐藏
+				dialogVisibleImg:false,
+//				上传的路径
+				actionPath:'http://127.0.0.1:8888/api/private/v1/upload',
+//				上传的请求头,配置token
+				headerObj:{
+					Authorization:window.sessionStorage.getItem('token')
+				},
+//				预览大图的url
+				imgUrl:''
 			}
 		},
 		methods:{
@@ -191,6 +235,89 @@
 					}
 					this.onlyCateList = ret.data
 				}
+			},
+			
+			//移除上传的图片的方法
+			
+			handleRemove(file) {
+//			    console.log(file);
+			},
+			
+			
+			
+//			点击图片时触发的函数
+			handlePreview(file) {
+//			    console.log(file)
+			    this.dialogVisibleImg = true
+			    this.imgUrl = file.response.data.url
+			    const temPath = file.response.data.tmp_path
+				//i是下标 ,x是数组的每一项
+				const i = this.addForm.pics.findIndex( x => {
+					//条件
+					 x.pic == temPath 
+				})
+				this.addForm.pics.splice(i,1);
+				
+//				console.log(this.addForm)
+			},
+			//点击上传图片列表
+			successFile(response){
+//				console.log(response)
+				const picsObj = {
+					pic:response.data.tmp_path
+				}
+				this.addForm.pics.push(picsObj)
+				
+				console.log( this.addForm )
+			},
+//			点击添加商品按钮
+			addShopping(){
+//				console.log('okk')
+				//表单的预校验
+				this.$refs.addFormRef.validate(async vali => {
+					if(!vali){
+						return this.$message.error('请输入表单内容')
+					}
+//					console.log('1111')
+					//处理表单数据,
+//					this.addForm.goods_cat 目前是数组,要转成字符串类型
+					//不能直接操作addForm这个对象。因为data数据中绑定的addForm必须是个数组
+					//可以把这个对象深拷贝一个,然后操作这个拷贝的对象，这样两个对象就互不干扰了
+					//把addForm深拷贝为forms
+					//需要安装插件lodash
+					//因为只在这个页面中使用，所有不用再全局中挂载，直接在这个页面挂载就行
+					const form = _.cloneDeep(this.addForm)
+					form.goods_cat = form.goods_cat.join(',')
+//					console.log(form)
+					//处理attrs 商品的参数（数组），包含 `动态参数` 和 `静态属性`
+					this.manyCateList.forEach( item => {
+						const obj = {
+							attr_id:item.attr_id,
+							attr_value:item.attr_vals.join()
+						}
+						this.addForm.attrs.push(obj)
+					})
+					console.log(this.manyCateList)
+					this.onlyCateList.forEach( item => {
+						const obj = {
+							attr_id:item.attr_id,
+							attr_value:item.attr_vals.join()
+						}
+						this.addForm.attrs.push(obj)
+					})
+					
+					form.attrs = this.addForm.attrs;
+//					console.log(form)
+					
+//					发送ajax
+					const {data:res} = await this.$http.post('goods',form)
+					if(res.meta.status !== 201){
+						return this.$message.error('创建失败')
+					}
+					this.$message.success('创建成功');
+					//创建成功之后返回到goods页面，用到链式编程
+					this.$router.push('/goods')
+				})
 			}
 			
 		},
@@ -219,5 +346,15 @@
 	}
 	.el-checkbox {
 		margin: 0 10px 0 0!important;
+	}
+	.imgs {
+		width: 100%;
+	}
+	.contentSS{
+		width: 80%;
+		height: 300PX;
+	}
+	.el-button {
+		margin-top: 80px;
 	}
 </style>

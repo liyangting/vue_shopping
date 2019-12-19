@@ -15,7 +15,7 @@
 				<!--左边栏-->
 			
 				<el-aside :width="flag?'64px':'200px'">
-				  
+				<!--<el-menu background-color="#545c64" /text-color="#fff" active-text-color="#ffd04b" :unique-opened="true" :collapse="flag" :collapse-transition="false" router>-->  
 				<el-menu :unique-opened="true" unique-opened :collapse="flag" :collapse-transition="false" router  :default-active="path">
 									<!--//-->
 					<div class="homgtogger">
